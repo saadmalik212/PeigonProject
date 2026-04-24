@@ -5,6 +5,7 @@ import { ref, onValue } from "firebase/database";
 import Nav from "./Nav";
 import DatePage from "./DatePage";
 import TotalPage from "./TotalPage";
+import Top10Users from "./Top10Users";
 
 export default function User() {
   const { dateSlug } = useParams();
@@ -65,6 +66,8 @@ export default function User() {
       <Nav isAdmin={false} />
       {dateSlug === 'total' ? (
         <TotalPage dates={dates} isAdmin={false} users={users} calculateTotal={calculateTotal} />
+      ) : dateSlug === 'top10' ? (
+        <Top10Users dates={dates} isAdmin={false} users={users} calculateTotal={calculateTotal} />
       ) : (
         <DatePage date={currentDate} isAdmin={false} users={users} calculateTotal={calculateTotal} />
       )}

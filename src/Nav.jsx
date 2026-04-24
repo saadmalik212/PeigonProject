@@ -14,20 +14,26 @@ export default function Nav({ isAdmin }) {
   const base = isAdmin ? "/admin" : "/user";
 
   return (
-    <nav className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 shadow-lg">
-      <div className="container mx-auto flex flex-wrap justify-center space-x-4">
+    <nav className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+      <div className="flex flex-wrap justify-center gap-2 px-2 py-4 md:px-4 md:py-5">
         {dates.map((d) => (
           <Link
             key={d.slug}
             to={`${base}/${d.slug}`}
-            className="hover:text-yellow-300 transition duration-300 font-medium text-sm"
+            className="px-3 md:px-4 py-2 md:py-2 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 hover:from-blue-400 hover:to-blue-600 transition duration-300 font-medium text-xs md:text-sm shadow-md hover:shadow-lg transform hover:scale-105"
           >
             {d.label}
           </Link>
         ))}
         <Link
+          to={`${base}/top10`}
+          className="px-3 md:px-4 py-2 md:py-2 rounded-lg bg-gradient-to-br from-purple-500 to-purple-700 hover:from-purple-400 hover:to-purple-600 transition duration-300 font-bold text-xs md:text-sm shadow-md hover:shadow-lg transform hover:scale-105"
+        >
+          Top 10 Users
+        </Link>
+        <Link
           to={`${base}/total`}
-          className="hover:text-yellow-300 transition duration-300 font-bold text-sm"
+          className="px-3 md:px-4 py-2 md:py-2 rounded-lg bg-gradient-to-br from-pink-500 to-pink-700 hover:from-pink-400 hover:to-pink-600 transition duration-300 font-bold text-xs md:text-sm shadow-md hover:shadow-lg transform hover:scale-105"
         >
           Total Page
         </Link>
