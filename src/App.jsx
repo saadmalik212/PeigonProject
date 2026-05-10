@@ -3,10 +3,12 @@ import Admin from "./Admin";
 import User from "./User";
 import Login from "./Login";
 import ProtectedRoute from "./ProtectedRoute";
+import Header from "./Header";
 
 export default function App() {
   return (
     <BrowserRouter>
+      <Header />
       <Routes>
         <Route path="/" element={<Navigate to="/user/24-April" replace />} />
         <Route path="/login" element={<Login />} />

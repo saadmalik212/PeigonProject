@@ -6,6 +6,8 @@ import { signOut } from "firebase/auth";
 import Nav from "./Nav";
 import DatePage from "./DatePage";
 import TotalPage from "./TotalPage";
+import Top10Users from "./Top10Users";
+import { getDateData, convertTo12Hour } from "./utils";
 
 // 🆕 HELPER FUNCTION: Format minutes to hours and minutes
 export const formatTime = (minutes) => {
@@ -69,11 +71,19 @@ export default function Admin() {
   const addUser = () => {
     if (!name || !baseTime) return alert("Fill all fields");
 
-    push(ref(db, "users/"), {
+    const newUser = {
       name,
-      baseTime,
       dates: {},
-    });
+    };
+
+    if (currentDate) {
+      newUser.dates[currentDate] = {
+        baseTime,
+        times: new Array(9).fill(""),
+      };
+    }
+
+    push(ref(db, "users/"), newUser);
 
     setShowModal(false);
     setName("");
@@ -90,25 +100,72 @@ export default function Admin() {
     setSelectedUser(user);
     setSelectedDate(date);
     setSelectedIndex(index);
-    setSelectedTime(user.dates?.[date]?.[index] || "");
+    const { baseTime, times } = getDateData(user, date);
+    setSelectedTime(index === -1 ? baseTime : times[index] || "");
     setCellModal(true);
   };
 
   const saveCellTime = () => {
-    let times = [...(selectedUser.dates?.[selectedDate] || new Array(9).fill(""))];
-    times[selectedIndex] = selectedTime;
-    let dates = { ...selectedUser.dates };
-    dates[selectedDate] = times;
+    const dateEntry = selectedUser.dates?.[selectedDate];
+    let times = [];
+    let entryBaseTime = "";
+
+    if (Array.isArray(dateEntry)) {
+      times = [...dateEntry];
+      entryBaseTime = selectedUser.baseTime || "";
+    } else if (dateEntry && typeof dateEntry === "object") {
+      times = Array.isArray(dateEntry.times) ? [...dateEntry.times] : new Array(9).fill("");
+      entryBaseTime = dateEntry.baseTime || "";
+    } else {
+      times = new Array(9).fill("");
+    }
+
+    if (selectedIndex === -1) {
+      entryBaseTime = selectedTime;
+    } else {
+      times[selectedIndex] = selectedTime;
+    }
+
+    const dates = {
+      ...selectedUser.dates,
+      [selectedDate]: {
+        baseTime: entryBaseTime,
+        times,
+      },
+    };
 
     update(ref(db, "users/" + selectedUser.id), { dates });
     setCellModal(false);
   };
 
   const deleteCellTime = () => {
-    let times = [...(selectedUser.dates?.[selectedDate] || new Array(9).fill(""))];
-    times[selectedIndex] = "";
-    let dates = { ...selectedUser.dates };
-    dates[selectedDate] = times;
+    const dateEntry = selectedUser.dates?.[selectedDate];
+    let times = [];
+    let entryBaseTime = "";
+
+    if (Array.isArray(dateEntry)) {
+      times = [...dateEntry];
+      entryBaseTime = selectedUser.baseTime || "";
+    } else if (dateEntry && typeof dateEntry === "object") {
+      times = Array.isArray(dateEntry.times) ? [...dateEntry.times] : new Array(9).fill("");
+      entryBaseTime = dateEntry.baseTime || "";
+    } else {
+      times = new Array(9).fill("");
+    }
+
+    if (selectedIndex === -1) {
+      entryBaseTime = "";
+    } else {
+      times[selectedIndex] = "";
+    }
+
+    const dates = {
+      ...selectedUser.dates,
+      [selectedDate]: {
+        baseTime: entryBaseTime,
+        times,
+      },
+    };
 
     update(ref(db, "users/" + selectedUser.id), { dates });
     setCellModal(false);
@@ -170,6 +227,13 @@ export default function Admin() {
           calculateTotal={calculateTotal} 
           formatTime={formatTime}  // 🆕 Pass formatTime
         />
+      ) : dateSlug === 'top10' ? (
+        <Top10Users 
+          dates={dates} 
+          isAdmin={true} 
+          users={users} 
+          calculateTotal={calculateTotal} 
+        />
       ) : (
         <DatePage 
           date={currentDate} 
@@ -195,6 +259,7 @@ export default function Admin() {
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
+            <label className="block text-sm text-gray-700 mb-1">Base Time for {currentDate || "this date"}</label>
             <input
               type="time"
               className="border p-2 w-full mb-4 rounded"
@@ -223,7 +288,9 @@ export default function Admin() {
       {cellModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg w-80 shadow-xl">
-            <h2 className="text-xl mb-4 font-bold">Edit Time for {selectedDate} T{selectedIndex + 1}</h2>
+            <h2 className="text-xl mb-4 font-bold">
+              {selectedIndex === -1 ? `Edit Base Time for ${selectedDate}` : `Edit Time for ${selectedDate} T${selectedIndex + 1}`}
+            </h2>
             <input
               type="time"
               value={selectedTime}
