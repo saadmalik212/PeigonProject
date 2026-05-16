@@ -1,31 +1,35 @@
 export default function Header() {
   return (
-    <div className="w-full bg-white shadow-md">
-      <div className="w-full flex justify-between items-center ">
+    <div className="w-full bg-black shadow-md overflow-hidden">
+      {/* 1. flex-row maintain rakha hai taake mobile par bhi images sath rahein.
+          2. gap-0 aur p-0 se extra space khatam.
+      */}
+      <div className="w-full flex flex-row justify-center items-center p-0 gap-0">
+        
         {/* Left Image */}
-        <div className="flex-1 flex justify-start">
+        <div className="flex">
           <img 
             src="/one.png" 
             alt="one" 
-            className="w-64 h-64 object-contain"
+            className="w-32 h-32 md:w-64 md:h-64 object-contain"
           />
         </div>
 
         {/* Center Image */}
-        <div className="flex-1 flex justify-center">
+        <div className="flex">
           <img 
             src="/asad.PNG" 
             alt="asad" 
-            className="w-64 h-64 object-contain"
+            className="w-32 h-32 md:w-64 md:h-64 object-contain"
           />
         </div>
 
         {/* Right Image */}
-        <div className="flex-1 flex justify-end">
+        <div className="flex">
           <img 
             src="/Two.jpeg" 
             alt="two" 
-            className="h-64 w-64 object-contain"
+            className="w-32 h-32 md:w-64 md:h-64 object-contain"
           />
         </div>
       </div>
